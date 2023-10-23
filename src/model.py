@@ -1,4 +1,5 @@
-from sklearn.model_selection import train_test_split, GridSearchCV
+import numpy as np
+from sklearn.model_selection import train_test_split, GridSearchCV, cross_val_score
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 def run_model(X, y, pipeline, grid=None, scorer=None, rs=42):
@@ -34,7 +35,13 @@ def run_model(X, y, pipeline, grid=None, scorer=None, rs=42):
 
         'model': model,
         'train_score': model.score(X_train, y_train),
-        'test_score': model.score(X_test, y_test)
+        'test_score': model.score(X_test, y_test),
+        'mean_absolute_error': np.mean(
+            cross_val_score(model, X_train, y_train, scoring='neg_mean_absolute_error', cv=3)),
+        'mean_squared_error': np.mean(
+            cross_val_score(model, X_train, y_train, scoring='neg_mean_squared_error', cv=3)),
+        'r2_score': np.mean(
+            cross_val_score(model, X_train, y_train, scoring='r2', cv=3))
     }
 
     return results
